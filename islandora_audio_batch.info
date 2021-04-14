@@ -1,0 +1,12 @@
+name = Islandora Audio Batch
+description = "Batch ingest audio objects"
+package = Islandora
+version = 7.x-dev
+core = 7.x
+dependencies[] = islandora_batch
+dependencies[] = islandora_audio
+dependencies[] = islandora_compound_object
+files[] = includes/preprocessor.inc
+files[] = includes/object.inc
+files[] = includes/utilities.inc
+php = 5.3
