@@ -46,7 +46,7 @@ function islandora_audio_batch_menu_access($object) {
  *
  * Gives the parent object the TN of its first child.
  */
-/*
+
 function islandora_audio_batch_islandora_datastream_ingested(AbstractObject $object, AbstractDatastream $datastream) {
   $create_thumbs = variable_get('islandora_audio_object_thumbnail_child', TRUE);
   if ($create_thumbs) {
@@ -69,4 +69,3 @@ function islandora_audio_batch_islandora_datastream_ingested(AbstractObject $obj
     }
   }
 }
-*/

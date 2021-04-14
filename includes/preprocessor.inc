@@ -11,14 +11,14 @@ include $path . '/includes/utilities.inc';
  */
 class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
   // Prefixed flag for outputing echo or print statements.
-  protected $icbpVerbose = FALSE;
+  protected $iacpVerbose = FALSE;
   /**
    * Function to get the OBJ XML files from the input directory.
    */
   public function preprocess() {
 
-    if (strtolower($this->parameters['icbp_verbose']) == 'true') {
-      $this->icbpVerbose = TRUE;
+    if (strtolower($this->parameters['iacp_verbose']) == 'true') {
+      $this->iacpVerbose = TRUE;
     }
 
     // Accumulate a list of the objects added to the queue.
@@ -71,12 +71,12 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
   }
 
   /**
-   * Echos statement if icbpVerbose property is true.
+   * Echos statement if iacpVerbose property is true.
    *
-   * Set using --icbp_verbose drush option.
+   * Set using --iacp_verbose drush option.
    */
-  public function icbpecho($string) {
-    if ($this->icbpVerbose == TRUE) {
+  public function iacpecho($string) {
+    if ($this->iacpVerbose == TRUE) {
       echo $string;
     }
   }
@@ -108,19 +108,19 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
     $wanted_tags = array('child');
     foreach ($doc->getElementsByTagName('*') as $node) {
       if (in_array($node->nodeName, $wanted_tags)) {
-        $this->icbpecho("Node name:\t" . $node->nodeName . "\n");
+        $this->iacpecho("Node name:\t" . $node->nodeName . "\n");
         if ($node->nodeName == 'child') {
           $xpath = new DOMXPath($doc);
           $child_contents = $xpath->query('@content', $node);
           $child_content = $child_contents->item(0);
-          $this->icbpecho("Child content value:\t" . $child_content->nodeValue . "\n");
+          $this->iacpecho("Child content value:\t" . $child_content->nodeValue . "\n");
           $child_content_value = $child_content->nodeValue;
         }
         $path = $node->getNodePath();
-        $this->icbpecho("Path:\t\t$path\n");
+        $this->iacpecho("Path:\t\t$path\n");
 
         $parent_node = $node->parentNode;
-        $this->icbpecho("Parent path:\t" . $parent_node->getNodePath() . "\n\n");
+        $this->iacpecho("Parent path:\t" . $parent_node->getNodePath() . "\n\n");
 
         $parent_node = trim($parent_node->getNodePath());
         $insert_result = db_insert('islandora_audio_batch')
@@ -133,7 +133,7 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
                         'batch_id' => $batch_id,
                ))->execute();
 
-        $this->icbpecho("Insert Result: $insert_result" . PHP_EOL);
+        $this->iacpecho("Insert Result: $insert_result" . PHP_EOL);
       }
 
     }

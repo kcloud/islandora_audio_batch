@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This module extends the Islandora batch framework to provide a Drush command to ingest audio objects. Currently, only batches of compound objects that have a "flat" structure are supported. In other words, batches of compound objects whose children do not contain other children:
+This module extends the Islandora batch framework to provide a Drush command to ingest audio objects. In other words, batches of audio objects whose children do not contain other children:
 
 ```
 batch_directory/
@@ -35,6 +35,8 @@ This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
 * [Islandora Batch](https://github.com/Islandora/islandora_batch)
+* [Islandora Compound Batch](https://github.com/Islandora/islandora_compound_batch)
+* [Islandora Solution Pack Audio](https://github.com/Islandora/islandora_solution_pack_audio)
 
 # Installation
 
@@ -183,5 +185,6 @@ or
 
 ## Author/License
 
-Written by Kevin Cloud for the University of Pittsburgh. Copyright University of Pittsburgh.
+Written by Kevin Cloud for the University of Pittsburgh. Copyright (c) University of Pittsburgh.
 
+Released under a license of GPL v2 or later.
