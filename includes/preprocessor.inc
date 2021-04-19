@@ -69,7 +69,7 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
         }
         else {
           // Parent wrapper object is audio.
-          $batch_object->models = 'islandora:audioCmodel';
+          $batch_object->models = 'islandora:compoundCmodel';
         }
 
         // Ad the instance to the Islandora batch queue.
