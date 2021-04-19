@@ -104,7 +104,17 @@ class IslandoraAudioBatchObject extends IslandoraBatchObject {
       }
     }
     else {
-      $this->models = 'islandora:audioCModel';
+      $parent_obj_pattern = $dir_name . DIRECTORY_SEPARATOR . 'OBJ.*';
+      $obj_file_list = glob($parent_obj_pattern);
+      if (count($obj_file_list) === 1) {
+        $file_extension = pathinfo($obj_file_list[0], PATHINFO_EXTENSION);
+        $parent_content_model = $cb_utilities->getContentModelFromFileExt($file_extension);
+        $this->models = $parent_content_model;
+        $this->ingestObjDatastream($obj_file_list[0]);
+      }
+      else {
+        $this->models = 'islandora:audioCModel';
+      }
       $this->relationships->add(FEDORA_RELS_EXT_URI, 'isMemberOfCollection', $this->preprocessorParameters['parent']);
     }
 
@@ -158,15 +168,6 @@ class IslandoraAudioBatchObject extends IslandoraBatchObject {
    * Implements addRelationships.
    */
   public function addRelationships() {
-  }
-
-  /**
-   * Add basic relationships for parent object.
-   */
-  public function addRelationshipsForParent() {
-    // ToDo? Set model(s) based on extention to model map?
-    // parent objects are audio.
-    $this->models = 'islandora:audioCModel';
   }
 
   /**
