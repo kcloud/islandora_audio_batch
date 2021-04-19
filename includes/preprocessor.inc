@@ -23,6 +23,9 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
 
     // Accumulate a list of the objects added to the queue.
     $added = array();
+    
+    // Keep track of PIDS added -- child PID can only be added once to database.
+    $added_pids = array();
 
     $input_path = $this->parameters['target'];
     // Add batchset_id property for use later in ingest phase in object.inc
@@ -41,46 +44,53 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
       $file_extension = pathinfo($file_path, PATHINFO_EXTENSION);
       $file_name_with_extension = basename($file_path);
       $is_obj_file = $cb_utilities->extInContentModelMap($file_extension);
-      if ($fileinfo->isFile() && $is_obj_file) {
-        $batch_object = new IslandoraAudioBatchObject($this->connection, $file_path, $this->parameters);
-        // Add the instances to the Islandora batch queue.
-        $this->addToDatabase($batch_object);
-        $added[] = $batch_object;
-      }
-      if ($file_name_with_extension == 'structure.xml') {
+      $parts = explode('/', $file_path);
+      $pid = $this->parameters['namespace'] . ':' . str_replace("batch_", "", $parts[(count($parts) - 2)]);
+      if ((array_search($pid, $added_pids) === FALSE)) {
+        // this object's pid will need to be set because the children override the value in 
+        // the top half of this logic -- and the parent compound object will need to have 
+        // that value assigned again before adding to database.
+        $this->parameters['assign_pid'] = $pid;
 
-        // The structure file will be in the root directory of the audio
-        // object.  We need to create a parent wrapper object to associate
-        // the OBJ child objects too.  Along with the structure file in the
-        // root directory of the audio object there should be a MODS file
-        // (or other metadata file) giving information about the object.
-        // Associate this with the batch object. There may also be an OBJ file
-        // that belongs to non-islandora:audioCModel parent objects.
-        $parent_mods_file_path = dirname($file_path) . DIRECTORY_SEPARATOR . 'MODS.xml';
-        $batch_object = new IslandoraAudioBatchObject($this->connection, $parent_mods_file_path, $this->parameters);
-
-        $parent_obj_pattern = dirname($file_path) . DIRECTORY_SEPARATOR . 'OBJ.*';
-        $obj_file_list = glob($parent_obj_pattern);
-        if (count($obj_file_list) === 1) {
-          $file_extension = pathinfo($obj_file_list[0], PATHINFO_EXTENSION);
-          $parent_content_model = $cb_utilities->getContentModelFromFileExt($file_extension);
-          // Parent wrapper object is determined by extension of any OBJ file present.
-          $batch_object->models = $parent_content_model;
+        if ($fileinfo->isFile() && $is_obj_file) {
+          $added_pids[] = $pid;
+          $this->parameters['content_models'] = $this->get_model_from_filename($file_name_with_extension);
+          $batch_object = new IslandoraCompoundBatchObject($this->connection, $file_path, $this->parameters);
+          // Add the instances to the Islandora batch queue.
+          $this->addToDatabase($batch_object);
+          $added[] = $batch_object;
         }
-        else {
-          // Parent wrapper object is audio.
+        if ($file_name_with_extension == 'structure.xml') {
+          $added_pids[] = $pid;
+          // The structure file will be in the root directory of the compound
+          // object.  We need to create a parent wrapper object to associate
+          // the OBJ child objects too.  Along with the structure file in the
+          // root directory of the compound object there should be a MODS file
+          // (or other metadata file) giving information about the object.
+          // Associate this with the batch object.
+          $parent_mods_file_path = dirname($file_path) . DIRECTORY_SEPARATOR . 'MODS.xml';
+          $batch_object = new IslandoraCompoundBatchObject($this->connection, $parent_mods_file_path, $this->parameters);
+          // Parent wrapper object must be compound.
           $batch_object->models = 'islandora:compoundCmodel';
+          // Ad the instance to the Islandora batch queue.
+          // Returns PID for parent object.
+          $compound_object_pid = $this->addToDatabase($batch_object);
+          $this->addStructureData($file_path, $compound_object_pid);
         }
-
-        // Ad the instance to the Islandora batch queue.
-        // Returns PID for parent object.
-        $audio_object_pid = $this->addToDatabase($batch_object);
-        $this->addStructureData($file_path, $audio_object_pid);
       }
 
     }
 
     return $added;
+  }
+  
+  /**
+  * To get the content_models value for the child object based on the filename.
+  *
+  * @param type $filename
+  */
+  public function get_model_from_filename($filename) {
+    return 'islandora:sp_audioCModel';
   }
 
   /**

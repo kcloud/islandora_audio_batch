@@ -51,6 +51,11 @@ function islandora_audio_batch_drush_command() {
       'parent_relationship_pred' => array(
         'description' => 'The predicate of the relationship to the parent. Defaults to "isMemberOf".',
         'value' => 'optional',
+      ),      
+      'assign_pid' => array(
+        'description' => 'The PID value (including namespace) to assign to the object. If this value ' .
+        'is provided, the namespace value is ignored.',
+        'value' => 'optional',
       ),
 //
     ),
@@ -91,8 +96,11 @@ function drush_islandora_audio_batch_preprocess() {
   // connection gets created should fix it.
   drupal_static_reset('islandora_get_tuque_connection');
   $connection = islandora_get_tuque_connection();
-  $parameters = array(
+  module_load_include('inc', 'islandora_batch', 'includes/common');
+  $base_parameters = islandora_batch_get_base_drush_parameters();
+  $compound_batch_parameters = array(
     'type' => drush_get_option('type'),
+    'assign_pid' => drush_get_option('assign_pid'),
     'namespace' => drush_get_option('namespace'),
     'target' => DRUSH_VERSION >= 7 ? drush_get_option('scan_target') : drush_get_option('target'),
     'parent' => drush_get_option('parent', 'islandora:audioCollection'),
@@ -101,7 +109,7 @@ function drush_islandora_audio_batch_preprocess() {
     'parent_relationship_uri' => drush_get_option('parent_relationship_uri', 'info:fedora/fedora-system:def/relations-external#'),
     'parent_relationship_pred' => drush_get_option('parent_relationship_pred', 'isMemberOf'),
   );
-
+  $parameters = array_merge($base_parameters, $compound_batch_parameters);
   // Pass the preprocessor off to run.
   $preprocessor = new IslandoraAudioBatchPreprocessor($connection, $parameters);
   $preprocessed = islandora_batch_handle_preprocessor($preprocessor);
