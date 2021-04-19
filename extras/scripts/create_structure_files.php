@@ -1,26 +1,26 @@
-<?php
+audio<?php
 /**
  * @file
- * Helper script for Islandora Compound Batch that generates a "structure file"
- * for each compound oject arranged under a root directory:.
+ * Helper script for Islandora Audio Batch that generates a "structure file"
+ * for each audio oject arranged under a root directory:.
  *
- * Path_to_directory_containing_compound_objects\
- *    compound_object_1\
+ * Path_to_directory_containing_audio_objects\
+ *    audio_object_1\
  *      child_1\
  *      child_2\
- *    compound_object_2\
+ *    audio_object_2\
  *      child_1\
  *      child_2\
  *      child_3\
- *    compound_object_3\
+ *    audio_object_3\
  *    [...]
  *
- * This script must be run to prepare compound objects for ingesting using
- * Islandora Compound Batch.
+ * This script must be run to prepare audio objects for ingesting using
+ * Islandora Audio Batch.
  *
  * Usage:
  *
- * > php create_strcutre_files.php path_to_directory_containing_compound_objects
+ * > php create_strcutre_files.php path_to_directory_containing_audio_objects
  */
 
 
@@ -30,7 +30,7 @@ if (!is_dir($target_directory)) {
   exit("Please check that you have provided a full path to a directory as the input argument." . PHP_EOL);
 }
 
-$path_to_xsl = "tree_to_compound_object.xsl";
+$path_to_xsl = "tree_to_audio_object.xsl";
 if (!file_exists($path_to_xsl)) {
   exit("Cannot find the required XSLT file ($path_to_xsl)." . PHP_EOL);
 }
@@ -38,7 +38,7 @@ if (!file_exists($path_to_xsl)) {
 scanWrapperDirectory($target_directory, 'structure', $path_to_xsl);
 
 // For use with use with get_dir_name(), which is used inside XSLT.
-$compound_obj_path = '';
+$audio_obj_path = '';
 
 /**
  * Recursively scans the target directory, generates the equivalent of the 'tree' command
@@ -50,17 +50,17 @@ function scanWrapperDirectory($target_directory, $structurefilename = 'structure
   $exclude_array = array('..', '.DS_Store', 'Thumbs.db', '.');
 
   $stuffinwrapperdirectory = scandir($target_directory);
-  foreach ($stuffinwrapperdirectory as $compoundObjectOrFile) {
-    $objpath = $target_directory . DIRECTORY_SEPARATOR . $compoundObjectOrFile;
-    if (!in_array($compoundObjectOrFile, $exclude_array) && is_dir($objpath)) {
-      global $compound_obj_path;
-      $compound_obj_path = $objpath;
-      // subdirectories of wrapper directory will be compound object.
+  foreach ($stuffinwrapperdirectory as $audioObjectOrFile) {
+    $objpath = $target_directory . DIRECTORY_SEPARATOR . $audioObjectOrFile;
+    if (!in_array($audioObjectOrFile, $exclude_array) && is_dir($objpath)) {
+      global $audio_obj_path;
+      $audio_obj_path = $objpath;
+      // subdirectories of wrapper directory will be audio object.
       // create a structure file for each.
-      $structure_xml = compoundObjectStructureXML($objpath);
+      $structure_xml = audioObjectStructureXML($objpath);
 
       // Apply XSLT.
-      $structure_xml = treeToCompound($path_to_xsl, $structure_xml);
+      $structure_xml = treeToAudio($path_to_xsl, $structure_xml);
       $structure_xml_output_file_path = $objpath . DIRECTORY_SEPARATOR
                                             . $structurefilename . '.xml';
       file_put_contents($structure_xml_output_file_path, $structure_xml);
@@ -68,7 +68,7 @@ function scanWrapperDirectory($target_directory, $structurefilename = 'structure
   }
 }
 
-function treeToCompound($path_to_xsl, $tree_output_xml) {
+function treeToaudio($path_to_xsl, $tree_output_xml) {
   $xsl = $path_to_xsl;
   // tree_output_xml is an xml string.
   $xml = $tree_output_xml;
@@ -96,8 +96,8 @@ function treeToCompound($path_to_xsl, $tree_output_xml) {
 function get_dir_name() {
   // global $input_dir;
   // global  $target_directory;
-  global $compound_obj_path;
-  $input_dir = $compound_obj_path;
+  global $audio_obj_path;
+  $input_dir = $audio_obj_path;
   $dir_path = preg_replace('/(\.*)/', '', $input_dir);
   $dir_path = rtrim($dir_path, DIRECTORY_SEPARATOR);
   $base_dir_pattern = '#^.*' . DIRECTORY_SEPARATOR . '#';
@@ -144,7 +144,7 @@ function directoryXML($directory_path, $state = NULL) {
   return $xml;
 }
 
-function compoundObjectStructureXML($dir_path) {
+function audioObjectStructureXML($dir_path) {
   $xmlstring = "<tree>";
   $xmlstring .= directoryXML($dir_path);
   $xmlstring .= "</tree>";
