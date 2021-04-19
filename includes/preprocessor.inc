@@ -33,7 +33,7 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
     $iterator = new RecursiveIteratorIterator($dir);
 
     // Audio batch utilities class.
-    $cb_utilities = new Utilies();
+    $cb_utilities = new Utilities();
 
     $files = array();
     foreach ($iterator as $fileinfo) {
