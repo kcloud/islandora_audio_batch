@@ -32,14 +32,8 @@ class IslandoraAudioBatchObject extends IslandoraBatchObject {
     $pathinfo = pathinfo($this->audioObjFilePath);
     $dir_name = $pathinfo['dirname'];
     $file_name = $pathinfo['filename'];
-    if ($file_name != 'MODS') {
-      $obj = $this->constructDatastream('OBJ', 'M');
-      $obj->label = 'OBJ Datastream';
-      // Must infer mimetype from file.
-      $mime_detector = new MimeDetect();
-      $obj->mimetype = $mime_detector->getMimetype($this->audioObjFilePath);
-      $obj->setContentFromFile($this->audioObjFilePath, FALSE);
-      $this->ingestDatastream($obj);
+    if ($file_name == 'OBJ') {
+      $this->ingestObjDatastream();
     }
 
     module_load_include('inc', 'islandora_audio_batch', 'includes/utilities');
@@ -258,4 +252,31 @@ EOQ;
     return FALSE;
   }
 
+  /**
+   * Creates an OBJ datastream.
+   *
+   * @param string $path_to_obj
+   *   If present, the absolut path to the file to use as
+   *   the OBJ datastream content.
+   **/
+  private function ingestObjDatastream($path_to_obj = NULL) {
+    if ($this['OBJ']) {
+      return;
+    }
+    $obj = $this->constructDatastream('OBJ', 'M');
+    $obj->label = 'OBJ Datastream';
+    // Must infer mimetype from file.
+    $mime_detector = new MimeDetect();
+    if (is_null($path_to_obj)) {
+      $obj->mimetype = $mime_detector->getMimetype($this->audioObjFilePath);
+      $obj->setContentFromFile($this->audioObjFilePath, FALSE);
+    }
+    else {
+      $obj->mimetype = $mime_detector->getMimetype($path_to_obj);
+      $obj->setContentFromFile($path_to_obj, FALSE);
+    }
+    $this->ingestDatastream($obj);
+  }
+
 }
+

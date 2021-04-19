@@ -54,11 +54,24 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
         // the OBJ child objects too.  Along with the structure file in the
         // root directory of the audio object there should be a MODS file
         // (or other metadata file) giving information about the object.
-        // Associate this with the batch object.
+        // Associate this with the batch object. There may also be an OBJ file
+        // that belongs to non-islandora:audioCModel parent objects.
         $parent_mods_file_path = dirname($file_path) . DIRECTORY_SEPARATOR . 'MODS.xml';
         $batch_object = new IslandoraAudioBatchObject($this->connection, $parent_mods_file_path, $this->parameters);
-        // Parent wrapper object must be audio.
-        $batch_object->models = 'islandora:audioCmodel';
+
+        $parent_obj_pattern = dirname($file_path) . DIRECTORY_SEPARATOR . 'OBJ.*';
+        $obj_file_list = glob($parent_obj_pattern);
+        if (count($obj_file_list) === 1) {
+          $file_extension = pathinfo($obj_file_list[0], PATHINFO_EXTENSION);
+          $parent_content_model = $cb_utilities->getContentModelFromFileExt($file_extension);
+          // Parent wrapper object is determined by extension of any OBJ file present.
+          $batch_object->models = $parent_content_model;
+        }
+        else {
+          // Parent wrapper object is audio.
+          $batch_object->models = 'islandora:audioCmodel';
+        }
+
         // Ad the instance to the Islandora batch queue.
         // Returns PID for parent object.
         $audio_object_pid = $this->addToDatabase($batch_object);
