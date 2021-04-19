@@ -69,7 +69,7 @@ function islandora_audio_batch_form_submit($form, $form_state) {
     'parent_relationship_pred' => 'isMemberOfCollection',
     'wait_for_metadata' => FALSE,
     'directory_dedup' => FALSE,
-    'content_models' => array('islandora:audioCModel'),
+    'content_models' => array('islandora:compoundCModel'),
   );
 
   $preprocessor = new IslandoraAudioBatch($connection, $parameters);

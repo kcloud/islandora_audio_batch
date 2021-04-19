@@ -153,7 +153,7 @@ class IslandoraAudioBatchObject extends IslandoraBatchObject {
     $parent_directory_name = basename(dirname(dirname($path)));
     $child_directory_name = basename(dirname($path));
     $child_content_value = $parent_directory_name . '/' . $child_directory_name;
-    $result = db_select('islandora_audio_batch', 'q')
+    $result = db_select('islandora_compound_batch', 'q')
         ->fields('q')
         ->condition('q.child_content_value', $child_content_value)
         ->condition('q.batch_id', $batchset_id)

@@ -35,7 +35,7 @@ function islandora_audio_batch_menu_access($object) {
   if (isset($object[$c]) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $object[$c])) {
     $cp = new CollectionPolicy($object[$c]->content);
 
-    return array_key_exists('islandora:audioCModel', $cp->getContentModels());
+    return array_key_exists('islandora:compoundCModel', $cp->getContentModels());
   }
 
   return FALSE;

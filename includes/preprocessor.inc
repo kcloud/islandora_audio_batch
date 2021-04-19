@@ -146,7 +146,7 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
         $this->iacpecho("Parent path:\t" . $parent_node->getNodePath() . "\n\n");
 
         $parent_node = trim($parent_node->getNodePath());
-        $insert_result = db_insert('islandora_audio_batch')
+        $insert_result = db_insert('islandora_compound_batch')
                     ->fields(array(
                         'object_id' => $object_id,
                         'object_xpath' => $path,
