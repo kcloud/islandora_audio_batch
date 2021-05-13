@@ -9,8 +9,8 @@
  * Implements hook_schema().
  */
 function islandora_audio_batch_schema() {
-  $schema['islandora_audio_batch'] = array(
-        // Specification for the "islandora_audio_batch" table.
+  $schema['islandora_compound_batch'] = array(
+        // Specification for the "islandora_compound_batch" table.
     'description' => 'Registers data for batch ingest of audio objects.',
     'fields' => array(
       'id' => array(

@@ -55,7 +55,7 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
         // root directory of the audio object there should be a MODS file
         // (or other metadata file) giving information about the object.
         // Associate this with the batch object. There may also be an OBJ file
-        // that belongs to non-islandora:audioCModel parent objects.
+        // that belongs to non-islandora:CompoundCModel parent objects.
         $parent_mods_file_path = dirname($file_path) . DIRECTORY_SEPARATOR . 'MODS.xml';
         $batch_object = new IslandoraAudioBatchObject($this->connection, $parent_mods_file_path, $this->parameters);
 
@@ -72,7 +72,7 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
           $batch_object->models = 'islandora:compoundCmodel';
         }
 
-        // Ad the instance to the Islandora batch queue.
+        // Add the instance to the Islandora batch queue.
         // Returns PID for parent object.
         $audio_object_pid = $this->addToDatabase($batch_object);
         $this->addStructureData($file_path, $audio_object_pid);
@@ -111,13 +111,6 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
     $doc = new DOMDocument();
     $doc->load($structure_file_path);
 
-    /*
-    <islandora_audio_object title="895">
-    <child content="893"/>
-    <child content="894"/>
-    </islandora_audio_object>
-     */
-
     $wanted_tags = array('child');
     foreach ($doc->getElementsByTagName('*') as $node) {
       if (in_array($node->nodeName, $wanted_tags)) {
@@ -136,7 +129,7 @@ class IslandoraAudioBatchPreprocessor extends IslandoraBatchPreprocessor {
         $this->iacpecho("Parent path:\t" . $parent_node->getNodePath() . "\n\n");
 
         $parent_node = trim($parent_node->getNodePath());
-        $insert_result = db_insert('islandora_audio_batch')
+        $insert_result = db_insert('islandora_compound_batch')
                     ->fields(array(
                         'object_id' => $object_id,
                         'object_xpath' => $path,

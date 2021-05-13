@@ -1,4 +1,4 @@
-audio<?php
+<?php
 /**
  * @file
  * Helper script for Islandora Audio Batch that generates a "structure file"
@@ -20,7 +20,7 @@ audio<?php
  *
  * Usage:
  *
- * > php create_strcutre_files.php path_to_directory_containing_audio_objects
+ * > php create_structure_files.php path_to_directory_containing_audio_objects
  */
 
 

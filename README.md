@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This module extends the Islandora batch framework to provide a Drush command to ingest audio objects. In other words, batches of audio objects whose children do not contain other children:
+This module extends the Islandora compound batch framework to provide a Drush command to ingest audio objects in batch. In other words, batches of compound parent objects whose children, audio objects, do not contain other children:
 
 ```
 batch_directory/
@@ -115,17 +115,17 @@ The value of the content attribute of each `<child>` element is the name of the 
 
 After you have prepared your content, the remaining steps are much like those required by other Islandora Batch drush scripts.
 
-The batch preprocessor is called as a drush script (see `drush help islandora_compound_batch_preprocess` for additional parameters):
+The batch preprocessor is called as a drush script (see `drush help islandora_audio_batch_preprocess` for additional parameters):
 
 Drush made the `target` parameter reserved as of Drush 7. To allow for backwards compatability this will be preserved.
 
 Drush 7 and above:
 
-`drush -v --user=admin islandora_compound_batch_preprocess --scan_target=/path/to/input/directory --namespace=mynamespace --parent=mynamespace:collection`
+`drush -v --user=admin islandora_audio_batch_preprocess --scan_target=/path/to/input/directory --namespace=mynamespace --parent=mynamespace:collection`
 
 Drush 6 and below:
 
-`drush -v --user=admin islandora_compound_batch_preprocess --target=/path/to/input/directory --namespace=mynamespace --parent=mynamespace:collection`
+`drush -v --user=admin islandora_audio_batch_preprocess --target=/path/to/input/directory --namespace=mynamespace --parent=mynamespace:collection`
 
 This will populate the queue (stored in the Drupal database) with base entries.
 
@@ -135,7 +135,7 @@ The queue of preprocessed items is then processed by running the ingest command:
 
 #### Pruning the list of relationships
 
-This module records parent-child relationships in a database table. Periodically, you should prune this table by running the following command:
+This module hijacks the islandora_compound_batch table, including the parent-child relationships in a database table. Periodically, you should prune this table by running the following command:
 
 `drush --user=admin islandora_compound_batch_prune_relationships`
 
@@ -143,45 +143,17 @@ This command will remove relationships associated with Islandora batch sets that
 
 ## OBJ extension to content model mappings
 
-This module determines which content model to assign to child objects based on the extension of the child's OBJ file. The mapping used is:
-
-```
-jpeg => islandora:sp_basic_image
-jpg => islandora:sp_basic_image
-jpeg => islandora:sp_basic_image
-gif => islandora:sp_basic_image
-png => islandora:sp_basic_image
-tif => islandora:sp_large_image_cmodel
-tiff => islandora:sp_large_image_cmodel
-jp2 => islandora:sp_large_image_cmodel
-pdf => islandora:sp_pdf
-mp3 => islandora:sp-audioCModel
-mp4a => islandora:sp-audioCModel
-m4a => islandora:sp-audioCModel
-oga => islandora:sp-audioCModel
-ogg => islandora:sp-audioCModel
-flac => islandora:sp-audioCModel
-wav => islandora:sp-audioCModel
-mp4 => islandora:sp_videoCModel
-m4v  => islandora:sp_videoCModel
-mkv  => islandora:sp_videoCModel
-mpeg => islandora:sp_videoCModel
-mpe => islandora:sp_videoCModel
-mpg => islandora:sp_videoCModel
-qt => islandora:sp_videoCModel
-mov => islandora:sp_videoCModel
-ogv => islandora:sp_videoCModel
-```
+This module uses features from the compound content model to assign to child objects based on the extension of the child's OBJ file. The mapping used is available, here: https://github.com/MarcusBarnes/islandora_compound_batch
 
 You can override these mappings by providing a comma-separated list of extension-to-cmodel mappings in the optional `--content_models` drush option, like this:
 
 Note:  `--target` applies to drush 6 and below, while `--scan_target` replaces this keyword in drush 7 and above.
 
-`drush -v --user=admin islandora_compound_batch_preprocess --content_models=pdf::islandora:fooCModel --target=/path/to/input/directory --namespace=mynamespace --parent=mynamespace:collection`
+`drush -v --user=admin islandora_audio_batch_preprocess --content_models=pdf::islandora:fooCModel --target=/path/to/input/directory --namespace=mynamespace --parent=mynamespace:collection`
 
 or
 
-`drush -v --user=admin islandora_compound_batch_preprocess --content_models=pdf::islandora:fooCModel,jpg::islandora:bar_cmodel --target=/path/to/input/directory --namespace=mynamespace --parent=mynamespace:collection`
+`drush -v --user=admin islandora_audio_batch_preprocess --content_models=pdf::islandora:fooCModel,jpg::islandora:bar_cmodel --target=/path/to/input/directory --namespace=mynamespace --parent=mynamespace:collection`
 
 ## Author/License
 

@@ -72,11 +72,6 @@ function islandora_audio_batch_drush_command() {
       'required' => TRUE,
     );
   }
-  $items['islandora_audio_batch_prune_relationships'] = array(
-    'aliases' => array('iabpr'),
-    'description' => 'Removes rows from the islandora_audio_batch table that no longer have a batch associated with them.',
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
-  );
 
   return $items;
 }
@@ -95,7 +90,7 @@ function drush_islandora_audio_batch_preprocess() {
     'type' => drush_get_option('type'),
     'namespace' => drush_get_option('namespace'),
     'target' => DRUSH_VERSION >= 7 ? drush_get_option('scan_target') : drush_get_option('target'),
-    'parent' => drush_get_option('parent', 'islandora:audioCollection'),
+    'parent' => drush_get_option('parent', 'islandora:compoundCollection'),
     'content_models' => drush_get_option('content_models'),
     'iabp_verbose' => drush_get_option('iabp_verbose'),
     'parent_relationship_uri' => drush_get_option('parent_relationship_uri', 'info:fedora/fedora-system:def/relations-external#'),
@@ -117,21 +112,4 @@ function drush_islandora_audio_batch_preprocess_validate() {
   if (!$object) {
     return drush_set_error('This is not a valid parent', dt('The specified parent (@parent) was unable to be loaded.', array('@parent' => $parent)));
   }
-  /*
-  if (!in_array('islandora:audioCModel', $object->models)) {
-  return drush_set_error('Not a audio object',
-  dt('The specified parent (@parent) is not a audio object.',
-  array('@parent' => $parent)));
-  }*/
-}
-
-/**
- * Implements hook_drush_command().
- */
-function drush_islandora_audio_batch_prune_relationships() {
-  // Delete all the rows from {islandora_audio_batch} that do not have
-  // corresponding rows in {islandora_batch_set}.
-  $result = db_query("DELETE icb FROM {islandora_audio_batch} icb LEFT JOIN {islandora_batch_set} o ON icb.batch_id = o.id WHERE o.id IS NULL");
-  $num_deleted = $result->rowCount();
-  drush_log(t("Deleted @n rows from islandora_audio_batch", array('@n' => $num_deleted)), "ok");
 }
